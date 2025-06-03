@@ -1821,6 +1821,7 @@ async function startServer() {
             }
         }
     }, 120000); // Every 2 minutes
+<<<<<<< HEAD
 
     // Hourly system status updates via Discord webhook
     setInterval(async () => {
@@ -1859,6 +1860,8 @@ async function startServer() {
             console.error('❌ Error sending hourly status update:', error.message);
         }
     }, 3600000); // Every hour (3600000 milliseconds)
+=======
+>>>>>>> ef4b5c065f1652d55fbdedbff3702adedb9bdefc
 }
 
 // Graceful shutdown handlers

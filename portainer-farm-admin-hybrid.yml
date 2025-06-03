@@ -4,7 +4,11 @@ services:
   farm-admin-hybrid:
     container_name: farm-admin-hybrid
     build:
+<<<<<<< HEAD
       context: https://swarnes1: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@github.com/swarnes1/farm-admin.git
+=======
+      context: .
+>>>>>>> ef4b5c065f1652d55fbdedbff3702adedb9bdefc
       dockerfile: Dockerfile.hybrid
       no_cache: false
       pull: true

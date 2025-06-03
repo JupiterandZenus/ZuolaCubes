@@ -6,14 +6,21 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
+<<<<<<< HEAD
     # Node.js and npm
+=======
+>>>>>>> ef4b5c065f1652d55fbdedbff3702adedb9bdefc
     curl \
     ca-certificates \
     gnupg \
     lsb-release \
+<<<<<<< HEAD
     # SSL dependencies
     openssl \
     # Network tools
+=======
+    openssl \
+>>>>>>> ef4b5c065f1652d55fbdedbff3702adedb9bdefc
     net-tools \
     iproute2 \
     iputils-ping \
@@ -22,6 +29,7 @@ RUN apt-get update && apt-get install -y \
     unzip \
     jq \
     bc \
+<<<<<<< HEAD
     # System utilities
     procps \
     lsof \
@@ -29,6 +37,12 @@ RUN apt-get update && apt-get install -y \
     # Build tools
     build-essential \
     # VNC and display dependencies
+=======
+    procps \
+    lsof \
+    dnsutils \
+    build-essential \
+>>>>>>> ef4b5c065f1652d55fbdedbff3702adedb9bdefc
     xvfb \
     x11vnc \
     xfce4 \
@@ -37,6 +51,7 @@ RUN apt-get update && apt-get install -y \
     supervisor \
     openssh-server \
     tigervnc-common \
+<<<<<<< HEAD
     # Browser dependencies
     chromium-browser \
     chromium-chromedriver \
@@ -48,19 +63,35 @@ RUN apt-get update && apt-get install -y \
     pulseaudio \
     alsa-utils \
     # noVNC dependencies
+=======
+    chromium-browser \
+    chromium-chromedriver \
+    fonts-liberation \
+    fonts-dejavu-core \
+    fontconfig \
+    pulseaudio \
+    alsa-utils \
+>>>>>>> ef4b5c065f1652d55fbdedbff3702adedb9bdefc
     python3 \
     python3-pip \
     python3-numpy \
     git \
     websockify \
+<<<<<<< HEAD
     # CPU manager dependencies
+=======
+>>>>>>> ef4b5c065f1652d55fbdedbff3702adedb9bdefc
     wmctrl \
     xdotool \
     sysstat \
     util-linux \
+<<<<<<< HEAD
     # Database client
     mysql-client \
     # Java dependencies
+=======
+    mysql-client \
+>>>>>>> ef4b5c065f1652d55fbdedbff3702adedb9bdefc
     software-properties-common \
     openjdk-11-jdk \
     && rm -rf /var/lib/apt/lists/*
@@ -81,6 +112,7 @@ RUN git clone https://github.com/novnc/noVNC.git /usr/share/novnc && \
     ln -s /usr/share/novnc/vnc.html /usr/share/novnc/index.html && \
     chmod -R 755 /usr/share/novnc
 
+<<<<<<< HEAD
 # Set up error handling for noVNC
 RUN echo 'window.onerror = function(msg, url, line, col, error) {' > /usr/share/novnc/app/error-handler.js && \
     echo '    if (msg && (msg.includes("addEventListener") || msg.includes("clipboard") || msg.includes("null"))) {' >> /usr/share/novnc/app/error-handler.js && \
@@ -90,25 +122,36 @@ RUN echo 'window.onerror = function(msg, url, line, col, error) {' > /usr/share/
     echo '    return false;' >> /usr/share/novnc/app/error-handler.js && \
     echo '};' >> /usr/share/novnc/app/error-handler.js
 
+=======
+>>>>>>> ef4b5c065f1652d55fbdedbff3702adedb9bdefc
 # Install Node.js 18.x
 RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
     && apt-get install -y nodejs
 
 # Generate SSL certificates
 RUN mkdir -p /etc/ssl/private && \
+<<<<<<< HEAD
     # Generate VNC server certificate
+=======
+>>>>>>> ef4b5c065f1652d55fbdedbff3702adedb9bdefc
     openssl req -x509 -nodes -days 3650 \
         -newkey rsa:4096 \
         -keyout /etc/ssl/private/vnc-server-key.pem \
         -out /etc/ssl/certs/vnc-server.pem \
         -subj "/C=US/ST=State/L=City/O=Organization/CN=vnc.local" && \
+<<<<<<< HEAD
     # Generate noVNC certificate
+=======
+>>>>>>> ef4b5c065f1652d55fbdedbff3702adedb9bdefc
     openssl req -x509 -nodes -days 3650 \
         -newkey rsa:4096 \
         -keyout /etc/ssl/private/novnc-key.pem \
         -out /etc/ssl/certs/novnc-cert.pem \
         -subj "/C=US/ST=State/L=City/O=Organization/CN=novnc.local" && \
+<<<<<<< HEAD
     # Set proper permissions
+=======
+>>>>>>> ef4b5c065f1652d55fbdedbff3702adedb9bdefc
     chmod 600 /etc/ssl/private/*.pem && \
     chmod 644 /etc/ssl/certs/*.pem
 
@@ -203,4 +246,8 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
 # Add metadata labels
 LABEL maintainer="Farm Admin Team" \
       version="0.1" \
+<<<<<<< HEAD
       description="Hybrid Farm Manager + DreamBot Container with Entry.sh and noVNC - Production Ready" 
+=======
+      description="Hybrid Farm Manager + DreamBot Container with Entry.sh and noVNC - Production Ready"
+>>>>>>> ef4b5c065f1652d55fbdedbff3702adedb9bdefc
