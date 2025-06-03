@@ -6,14 +6,11 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
-    # Node.js and npm
     curl \
     ca-certificates \
     gnupg \
     lsb-release \
-    # SSL dependencies
     openssl \
-    # Network tools
     net-tools \
     iproute2 \
     iputils-ping \
@@ -22,13 +19,10 @@ RUN apt-get update && apt-get install -y \
     unzip \
     jq \
     bc \
-    # System utilities
     procps \
     lsof \
     dnsutils \
-    # Build tools
     build-essential \
-    # VNC and display dependencies
     xvfb \
     x11vnc \
     xfce4 \
@@ -37,42 +31,36 @@ RUN apt-get update && apt-get install -y \
     supervisor \
     openssh-server \
     tigervnc-common \
-    # Browser dependencies
     chromium-browser \
     chromium-chromedriver \
-    # Font support
     fonts-liberation \
     fonts-dejavu-core \
     fontconfig \
-    # Audio support
     pulseaudio \
     alsa-utils \
-    # noVNC dependencies
     python3 \
     python3-pip \
     python3-numpy \
     git \
     websockify \
-    # CPU manager dependencies
     wmctrl \
     xdotool \
     sysstat \
     util-linux \
-    # Database client
     mysql-client \
-    # Java dependencies
     software-properties-common \
     openjdk-11-jdk \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Java 8 (required for DreamBot)
+# Install Java 8 (required for DreamBot) using Eclipse Temurin
 RUN apt-get update && \
-    apt-get install -y wget apt-transport-https && \
-    wget -qO - https://adoptopenjdk.jfrog.io/adoptopenjdk/api/gpg/key/public | apt-key add - && \
-    echo "deb https://adoptopenjdk.jfrog.io/adoptopenjdk/deb $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/adoptopenjdk.list && \
+    apt-get install -y wget apt-transport-https gpg && \
+    wget -qO - https://packages.adoptium.net/artifactory/api/gpg/key/public | gpg --dearmor | tee /etc/apt/trusted.gpg.d/adoptium.gpg > /dev/null && \
+    echo "deb https://packages.adoptium.net/artifactory/deb $(awk -F= '/^VERSION_CODENAME/{print$2}' /etc/os-release) main" | tee /etc/apt/sources.list.d/adoptium.list && \
     apt-get update && \
-    apt-get install -y adoptopenjdk-8-hotspot && \
-    update-alternatives --set java /usr/lib/jvm/adoptopenjdk-8-hotspot-amd64/bin/java
+    apt-get install -y temurin-8-jdk && \
+    update-alternatives --install /usr/bin/java java /usr/lib/jvm/temurin-8-jdk-amd64/bin/java 1 && \
+    rm -rf /var/lib/apt/lists/*
 
 # Install noVNC
 RUN git clone https://github.com/novnc/noVNC.git /usr/share/novnc && \
@@ -80,34 +68,22 @@ RUN git clone https://github.com/novnc/noVNC.git /usr/share/novnc && \
     ln -s /usr/share/novnc/vnc.html /usr/share/novnc/index.html && \
     chmod -R 755 /usr/share/novnc
 
-# Set up error handling for noVNC
-RUN echo 'window.onerror = function(msg, url, line, col, error) {' > /usr/share/novnc/app/error-handler.js && \
-    echo '    if (msg && (msg.includes("addEventListener") || msg.includes("clipboard") || msg.includes("null"))) {' >> /usr/share/novnc/app/error-handler.js && \
-    echo '        console.warn("Suppressed compatibility error:", msg);' >> /usr/share/novnc/app/error-handler.js && \
-    echo '        return true;' >> /usr/share/novnc/app/error-handler.js && \
-    echo '    }' >> /usr/share/novnc/app/error-handler.js && \
-    echo '    return false;' >> /usr/share/novnc/app/error-handler.js && \
-    echo '};' >> /usr/share/novnc/app/error-handler.js
-
 # Install Node.js 18.x
 RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
     && apt-get install -y nodejs
 
 # Generate SSL certificates
 RUN mkdir -p /etc/ssl/private && \
-    # Generate VNC server certificate
     openssl req -x509 -nodes -days 3650 \
         -newkey rsa:4096 \
         -keyout /etc/ssl/private/vnc-server-key.pem \
         -out /etc/ssl/certs/vnc-server.pem \
         -subj "/C=US/ST=State/L=City/O=Organization/CN=vnc.local" && \
-    # Generate noVNC certificate
     openssl req -x509 -nodes -days 3650 \
         -newkey rsa:4096 \
         -keyout /etc/ssl/private/novnc-key.pem \
         -out /etc/ssl/certs/novnc-cert.pem \
         -subj "/C=US/ST=State/L=City/O=Organization/CN=novnc.local" && \
-    # Set proper permissions
     chmod 600 /etc/ssl/private/*.pem && \
     chmod 644 /etc/ssl/certs/*.pem
 
@@ -174,7 +150,7 @@ ENV DISPLAY=:1 \
     USER=root \
     LANG=en_US.UTF-8 \
     LC_ALL=en_US.UTF-8 \
-    JAVA_HOME=/usr/lib/jvm/adoptopenjdk-8-hotspot-amd64 \
+    JAVA_HOME=/usr/lib/jvm/temurin-8-jdk-amd64 \
     PATH=$JAVA_HOME/bin:$PATH
 
 # Copy supervisord configuration
@@ -202,4 +178,4 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
 # Add metadata labels
 LABEL maintainer="Farm Admin Team" \
       version="0.1" \
-      description="Hybrid Farm Manager + DreamBot Container with Entry.sh and noVNC - Production Ready" 
+      description="Hybrid Farm Manager + DreamBot Container with Entry.sh and noVNC - Production Ready"
